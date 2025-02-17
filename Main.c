@@ -458,6 +458,68 @@ void excluir_Consulta (Consulta **consulta, int *pos_consulta){
     printf("Consulta nao encontrada\n");
 }
 
+// Funções Relatórios
+
+void consultas_Paciente(Consulta *consulta, int pos_consulta){
+    int id;
+    printf("Digite o identificador do paciente:\n");
+    scanf("%d",&id);
+    getchar();
+
+    printf("Consultas do paciente:\n\n");
+    for(int i = 0; i < pos_consulta; i++){
+        if(consulta[i].identificador_paciente == id){
+            printf("    Consulta %d\n",i+1);
+            printf("        Numero: %d\n",consulta[i].numero);
+            printf("        Identificador do medico: %d\n",consulta[i].identificador_medico);
+            printf("        Identificador do paciente: %d\n",consulta[i].identificador_paciente);
+            printf("        Horario: %s\n",consulta[i].horario);
+            printf("        Duracao: %s\n",consulta[i].duracao);
+            printf("        Data: %s\n\n",consulta[i].data);
+        }
+    }
+}
+
+void consultas_Medico(Consulta *consulta, int pos_consulta){
+    int id;
+    printf("Digite o identificador do medico:\n");
+    scanf("%d",&id);
+    getchar();
+
+    printf("Consultas do medico:\n\n");
+    for(int i = 0; i < pos_consulta; i++){
+        if(consulta[i].identificador_medico == id){
+            printf("    Consulta %d\n",i+1);
+            printf("        Numero: %d\n",consulta[i].numero);
+            printf("        Identificador do medico: %d\n",consulta[i].identificador_medico);
+            printf("        Identificador do paciente: %d\n",consulta[i].identificador_paciente);
+            printf("        Horario: %s\n",consulta[i].horario);
+            printf("        Duracao: %s\n",consulta[i].duracao);
+            printf("        Data: %s\n\n",consulta[i].data);
+        }
+    }
+}
+
+void lista_Medicos(Medico *medico, int pos_medico){
+    char especialidade[50];
+
+    while (getchar() != '\n'); // Limpar buffer antes de usar o fgets
+
+    printf("Digite a especialidade:\n");
+    fgets(especialidade,50,stdin);
+    especialidade[strcspn(especialidade,"\n")]='\0';
+
+    printf("Medicos da especialidade %s:\n\n",especialidade);
+    for(int i = 0; i < pos_medico; i++){
+        if(strcmp(medico[i].especialidade,especialidade) == 0){
+            printf("    Medico %d\n",i+1);
+            printf("        Nome: %s\n",medico[i].nome);
+            printf("        Especialidade: %s\n",medico[i].especialidade);
+            printf("        Identificador: %d\n\n",medico[i].identificador);
+        }
+    }
+}
+
 // Funções Arquivo
 
 void salvar_arquivo(int pos_medico, int pos_paciente, Medico *medico, Paciente *paciente) {
@@ -543,7 +605,7 @@ void ler_arquivo(int *pos_medico, int *pos_paciente, Medico **medico, Paciente *
 }
 
 int main() {
-    
+
     // Váriaveis de Controle
     int opcao=1, opcao_aux;
     
@@ -566,9 +628,9 @@ int main() {
         printf("    (1) (Medicos - Inserir, Imprimir, Alterar, Pesquisar, Excluir)\n");
         printf("    (2) (Pacientes - Inserir, Imprimir, Alterar, Pesquisar, Exlcuir)\n");
         printf("    (3) (Consultas - Inserir, Imprimir, Alterar, Pesquisar, Excluir)\n");
+        printf("    (4) (Relatorios)\n");
         printf("    (9) (Arquivo - Salvar, Carregar)\n");
         printf("    (0) (Sair)\n");
-        
         scanf("%d",&opcao);
 
         if(opcao == 0){
@@ -629,6 +691,24 @@ int main() {
             
         }
 
+        //Submenu Relatórios
+        else if(opcao == 4){
+            printf("        (1) Consultas por paciente\n");
+            printf("        (2) Consultas por medico\n");
+            printf("        (3) Lista de medicos por especialidade\n");
+            scanf("%d",&opcao_aux);
+
+            if(opcao_aux == 1)
+                consultas_Paciente(consulta, pos_consulta);
+            
+            if(opcao_aux == 2)
+                consultas_Medico(consulta, pos_consulta); 
+            
+            if(opcao_aux == 3)
+                lista_Medicos(medico, pos_medico);
+                
+        }
+
         // Submenu Consultas
         else if(opcao == 3){
             printf("        (1) Inserir consultas\n");
@@ -654,7 +734,8 @@ int main() {
             if(opcao_aux == 5)
                 excluir_Consulta(&consulta, &pos_consulta);
         }
-
+        
+        // Submenu Arquivo
         else if(opcao == 9){
             printf("        (1) Salvar dados no arquivo\n        (2) Carregar dados do arquivo\n");
             scanf("%d",&opcao_aux);
