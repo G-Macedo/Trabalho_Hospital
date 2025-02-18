@@ -500,25 +500,37 @@ void consultas_Medico(Consulta *consulta, int pos_consulta){
     }
 }
 
-void lista_Medicos(Medico *medico, int pos_medico){
+void listar_paciente_especialidade(Medico *medico, int pos_medico, Consulta *consulta, int pos_consulta, Paciente *paciente, int pos_paciente) {
     char especialidade[50];
 
-    while (getchar() != '\n'); // Limpar buffer antes de usar o fgets
+    while(getchar() != '\n');
 
-    printf("Digite a especialidade:\n");
-    fgets(especialidade,50,stdin);
-    especialidade[strcspn(especialidade,"\n")]='\0';
+    printf("Digite a especialidade do medico:\n");
+    fgets(especialidade, 50, stdin);
+    especialidade[strcspn(especialidade, "\n")] = '\0';
 
-    printf("Medicos da especialidade %s:\n\n",especialidade);
-    for(int i = 0; i < pos_medico; i++){
-        if(strcmp(medico[i].especialidade,especialidade) == 0){
-            printf("    Medico %d\n",i+1);
-            printf("        Nome: %s\n",medico[i].nome);
-            printf("        Especialidade: %s\n",medico[i].especialidade);
-            printf("        Identificador: %d\n\n",medico[i].identificador);
+    printf("Pacientes com consultas agendadas para a especialidade %s:\n\n", especialidade);
+    for (int i = 0; i < pos_medico; i++) {
+        if (strcmp(medico[i].especialidade, especialidade) == 0) {
+            for (int j = 0; j < pos_consulta; j++) {
+                if (consulta[j].identificador_medico == medico[i].identificador) {
+                    for (int k = 0; k < pos_paciente; k++) {
+                        if (consulta[j].identificador_paciente == paciente[k].identificador) {
+                            printf("    Paciente %d\n", k + 1);
+                            printf("        Nome: %s\n", paciente[k].nome);
+                            printf("        Identidade: %s\n", paciente[k].identidade);
+                            printf("        Sexo: %s\n", paciente[k].sexo);
+                            printf("        Telefone: %s\n", paciente[k].telefone);
+                            printf("        Endereco: %s\n", paciente[k].endereco);
+                            printf("        Identificador: %d\n\n", paciente[k].identificador);
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
 
 // Funções Arquivo
 
@@ -725,7 +737,7 @@ int main() {
         else if(opcao == 4){
             printf("        (1) Consultas por paciente\n");
             printf("        (2) Consultas por medico\n");
-            printf("        (3) Lista de medicos por especialidade\n");
+            printf("        (3) Listar paciente por especialidade\n");
             scanf("%d",&opcao_aux);
 
             if(opcao_aux == 1)
@@ -735,7 +747,7 @@ int main() {
                 consultas_Medico(consulta, pos_consulta); 
             
             if(opcao_aux == 3)
-                lista_Medicos(medico, pos_medico);
+                listar_paciente_especialidade(medico, pos_medico, consulta, pos_consulta, paciente, pos_paciente);
                 
         }
 
