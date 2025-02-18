@@ -522,7 +522,7 @@ void lista_Medicos(Medico *medico, int pos_medico){
 
 // Funções Arquivo
 
-void salvar_arquivo(int pos_medico, int pos_paciente, Medico *medico, Paciente *paciente) {
+void salvar_arquivo(int pos_medico, int pos_paciente, int pos_consulta, Medico *medico, Paciente *paciente, Consulta *consulta) {
 
     FILE *arq = fopen("Hospital.bin","wb");
     if(arq == NULL){
@@ -547,11 +547,21 @@ void salvar_arquivo(int pos_medico, int pos_paciente, Medico *medico, Paciente *
         fwrite(&paciente[i].identificador,sizeof(int),1,arq);
     }
 
+    fwrite(&pos_consulta,sizeof(int),1,arq);
+    for(int i = 0; i < pos_consulta; i++){
+        fwrite(consulta[i].data,sizeof(char),50,arq);
+        fwrite(consulta[i].duracao,sizeof(char),50,arq);
+        fwrite(consulta[i].horario,sizeof(char),50,arq);
+        fwrite(&consulta[i].identificador_medico,sizeof(int),1,arq);
+        fwrite(&consulta[i].identificador_paciente,sizeof(int),1,arq);
+        fwrite(&consulta[i].numero,sizeof(int),1,arq);
+    }
+
     fclose(arq);
     printf("\n - Dados salvos com sucesso! -\n\n");
 }
 
-void ler_arquivo(int *pos_medico, int *pos_paciente, Medico **medico, Paciente **paciente) {
+void ler_arquivo(int *pos_medico, int *pos_paciente, int *pos_consulta, Consulta **consulta, Medico **medico, Paciente **paciente) {
 
     FILE *arq = fopen("Hospital.bin","rb");
     if(arq == NULL){
@@ -570,9 +580,7 @@ void ler_arquivo(int *pos_medico, int *pos_paciente, Medico **medico, Paciente *
     for(int i = 0;i < *pos_medico;i++){ 
         (*medico)[i].especialidade = (char*)malloc(50*sizeof(char));
         (*medico)[i].nome          = (char*)malloc(50*sizeof(char));
-    }
 
-    for(int i = 0; i< *pos_medico; i++){
         fread((*medico)[i].especialidade,sizeof(char),50,arq);
         fread((*medico)[i].nome,sizeof(char),50,arq);
         fread(&(*medico)[i].identificador,sizeof(int),1,arq);
@@ -600,6 +608,28 @@ void ler_arquivo(int *pos_medico, int *pos_paciente, Medico **medico, Paciente *
         fread((*paciente)[i].telefone,sizeof(char),20,arq);
         fread(&(*paciente)[i].identificador,sizeof(int),1,arq);
     }
+    
+    
+
+    fread(pos_consulta,sizeof(int),1,arq);
+    *consulta=(Consulta*)realloc(*consulta,(*pos_consulta)*sizeof(Consulta));
+    if(*consulta == NULL){
+        printf("erro ao alocar memoria\n");
+        exit(1);
+    }
+    for(int i = 0; i < *pos_consulta; i++){
+        (*consulta)[i].data    = (char*)malloc(50*sizeof(char));
+        (*consulta)[i].duracao = (char*)malloc(50*sizeof(char));
+        (*consulta)[i].horario = (char*)malloc(50*sizeof(char));
+
+        fread((*consulta)[i].data,sizeof(char),50,arq);
+        fread((*consulta)[i].duracao,sizeof(char),50,arq);
+        fread((*consulta)[i].horario,sizeof(char),50,arq);
+        fread(&(*consulta)[i].identificador_medico,sizeof(int),1,arq);
+        fread(&(*consulta)[i].identificador_paciente,sizeof(int),1,arq);
+        fread(&(*consulta)[i].numero,sizeof(int),1,arq);
+    }
+
     printf("\n - Leitura de dados concluida -\n\n");
     fclose(arq);
 }
@@ -741,10 +771,10 @@ int main() {
             scanf("%d",&opcao_aux);
 
             if(opcao_aux == 1)
-                salvar_arquivo(pos_medico, pos_paciente, medico, paciente);
+                salvar_arquivo(pos_medico, pos_paciente, pos_consulta, medico, paciente, consulta);
 
             if(opcao_aux == 2)
-                ler_arquivo(&pos_medico, &pos_paciente, &medico, &paciente);
+                ler_arquivo(&pos_medico, &pos_paciente, &pos_consulta, &consulta, &medico, &paciente);
         }
     }
 
@@ -763,6 +793,13 @@ int main() {
         free(paciente[i].sexo);
     }
     free(paciente);
+
+    for(int i = 0; i < pos_consulta; i++){
+        free(consulta[i].data);
+        free(consulta[i].duracao);
+        free(consulta[i].horario);
+    }
+    free(consulta);
 
     return 0;  
 }
